@@ -1,7 +1,11 @@
-import getSchoolNames from './school_scraper';
-import createYearMapping from './map_meets_to_year';
+import getSchoolNames from './schoolScraper';
+import createYearMapping from './mapMeetsToYear';
+import { removeAll, formatList, printAll } from './arrayManipulation';
 
 export {
     getSchoolNames,
-    createYearMapping
+    createYearMapping,
+    removeAll,
+    formatList,
+    printAll
 }
