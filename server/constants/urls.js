@@ -36,7 +36,4 @@ const women_src_urls = [
 	'https://www.tfrrs.org/results/22056/f/NCAA_Division_I_West_Preliminary_Round/'
 ];
 
-export {
-    women_src_urls,
-    men_src_urls
-}
+export { women_src_urls, men_src_urls };
