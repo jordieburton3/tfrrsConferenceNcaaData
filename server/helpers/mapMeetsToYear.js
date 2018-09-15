@@ -1,4 +1,4 @@
-const createYearMapping = urls => {
+export const createYearMapping = urls => {
 	const result = {};
 	for (let i = 2018; i > 2010; i--) {
 		let meet_index = (2018 - i) * 2;
@@ -11,4 +11,11 @@ const createYearMapping = urls => {
 	return result;
 };
 
-export default createYearMapping;
+export const createConferenceYearMapping = urls => {
+	const result = {};
+	for (let i = 2018; i > 2010; i--) {
+		let meet_index = 2018 - i;
+		result[`${i}`] = urls[meet_index];
+	}
+	return result;
+};
