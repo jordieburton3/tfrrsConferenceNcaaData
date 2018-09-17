@@ -16,7 +16,7 @@ export const Schemas = [
 	`CREATE TABLE Results (
         year int NOT NULL,
         meetName VARCHAR(255) NOT NULL,
-        gender ENUM('M', 'F'),
+        gender ENUM('M', 'F', 'W'),
         athleteName  VARCHAR(255) NOT NULL,
         mark VARCHAR(255) NOT NULL,
         place int NOT NULL,
@@ -70,7 +70,6 @@ export const seed = mode => {
 		password: process.env.MYSQL_PASSWORD,
 		database: prod ? PRODUCTION_DB : TEST_DB
 	});
-
 	return new Promise(async (resolve, reject) => {
 		try {
 			if (!prod) {

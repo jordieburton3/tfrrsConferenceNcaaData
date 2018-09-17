@@ -1,8 +1,7 @@
 import { seed } from './db/schema';
 import db, { MODE_PRODUCTION, MODE_TEST } from './db';
-import dotenv from 'dotenv';
 
-dotenv.config();
+require('dotenv').config({ path: __dirname + '/.env' });
 
 const mode =
 	process.env.NODE_ENV === 'production' ? MODE_PRODUCTION : MODE_TEST;

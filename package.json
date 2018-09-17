@@ -4,12 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "seed": "babel-node ./server/seed.js --presets es2015,stage-2",
     "scrape": "babel-node server/scraper.js --presets es2015,stage-2"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
+    "dotenv": "^6.0.0",
+    "eslint": "^5.5.0",
+    "eslint-plugin-react": "^7.11.1",
+    "mysql": "github:mysqljs/mysql",
     "request": "^2.88.0"
   },
   "devDependencies": {

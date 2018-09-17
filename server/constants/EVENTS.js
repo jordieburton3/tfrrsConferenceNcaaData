@@ -7,7 +7,8 @@ export const FIELD_EVENTS = [
 	'Discus',
 	'Hammer',
 	'Long Jump',
-	'Triple Jump'
+	'Triple Jump',
+	'Weight Throw'
 ];
 
 export const MIDDLE_DISTANCE_EVENTS = [
@@ -15,7 +16,8 @@ export const MIDDLE_DISTANCE_EVENTS = [
 	'800 Meters',
 	'1000 Meters',
 	'1500 Meters',
-	'Mile'
+	'Mile',
+	' Mile'
 ];
 
 export const DISTANCE_EVENTS = [

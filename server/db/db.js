@@ -33,6 +33,7 @@ const connect = (mode, done) => {
 const get = () => state.pool;
 
 const disconnect = () => {
+	console.log('closing pool');
 	get().end();
 };
 

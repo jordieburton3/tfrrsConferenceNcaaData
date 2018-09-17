@@ -72,7 +72,8 @@ const parseRelay = (list, eventDetails) => {
 	return athleteData;
 };
 
-const determineEventGroup = event => {
+const determineEventGroup = input => {
+	let event = input[0] === ' ' ? input.replace(' ', '') : input;
 	if (FIELD_EVENTS.includes(event)) {
 		return 'field event';
 	} else if (SPRINTING_EVENTS.includes(event)) {
@@ -85,7 +86,7 @@ const determineEventGroup = event => {
 	return '';
 };
 
-const populateAthletes = (list, eventDetails, increment) => {
+const populateAthletes = (list, eventDetails, increment, meetYear) => {
 	if (FIELD_EVENTS.includes(eventDetails.event)) {
 		return [];
 	} else if (checkRelay(eventDetails.event)) {
@@ -99,6 +100,7 @@ const populateAthletes = (list, eventDetails, increment) => {
 			athleteDetails.year = list[i + 2];
 			athleteDetails.school = list[i + 3];
 			athleteDetails.mark = list[i + 4];
+			athleteDetails.meetYear = meetYear;
 			athleteDetails.eventGroup = determineEventGroup(eventDetails.event);
 			athleteData.push(athleteDetails);
 		}

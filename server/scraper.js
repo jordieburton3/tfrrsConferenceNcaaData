@@ -22,8 +22,12 @@ import {
 	populateAthletes
 } from './helpers';
 import { db } from './db';
+import { MODE_TEST } from './db/db';
+require('dotenv').config({ path: __dirname + '/.env' });
 
-const collectRegionalAthleteData = async (data, meetName) => {
+const PORT = process.env.PORT || 5000;
+
+const collectRegionalAthleteData = async (data, meetName, done) => {
 	let mappedMeets = createYearMapping(data, 2);
 	let compiledMeetResults = { meetName };
 	//scrapeAthleteData('https://www.tfrrs.org/results/36170/m/NCAA_East_Preliminary_Round/', 'm');
@@ -46,23 +50,22 @@ const collectRegionalAthleteData = async (data, meetName) => {
 			// 	: printAll(compiledMeetResults[year].west);
 		}
 	}
-	console.log(compiledMeetResults);
-	return compiledMeetResults;
+	done(compiledMeetResults);
 };
 
-const collectAthleteData = async (data, meetName) => {
-	let mappedMeets = createConferenceYearMapping(data, 1);
-	let compiledMeetResults = { meetName };
+const collectAthleteData = async (data, meetName, done) => {
+	let compiledMeetResults = { meetName, resultData: [] };
 	//scrapeAthleteData('https://www.tfrrs.org/results/36170/m/NCAA_East_Preliminary_Round/', 'm');
-	for (let year in mappedMeets) {
-		compiledMeetResults[year] = [];
+	for (let i = 0; i < data.length; i++) {
 		// console.log(prelims);
-		let meet = mappedMeets[year];
+		let meet = data[i];
 		let meetResults = await scrapeAthleteData(meet);
-		compiledMeetResults[year] = compiledMeetResults[year].concat(meetResults);
+		compiledMeetResults.resultData = compiledMeetResults.resultData.concat(
+			meetResults
+		);
 		//printAll(compiledMeetResults[year]);
 	}
-	return compiledMeetResults;
+	done(compiledMeetResults);
 };
 
 // name$school$@year@!event!
@@ -107,9 +110,22 @@ const scrapeAthleteData = async meet => {
 								(element.match(/\s/g) || []).length !== element.length
 							);
 						});
+					const yearText = $('.inline-block')
+						.text()
+						.split('\n')
+						.filter(element => {
+							return element.includes('201');
+						})[0]
+						.split(' ');
+					const year = yearText[yearText.length - 1];
 					const formattedData = formatText(removeAll(tableData));
 					compiledData = compiledData.concat(
-						populateAthletes(formattedData, eventInfo, columnDetails.length)
+						populateAthletes(
+							formattedData,
+							eventInfo,
+							columnDetails.length,
+							year
+						)
 					);
 				});
 				resolve(compiledData);
@@ -120,35 +136,71 @@ const scrapeAthleteData = async meet => {
 	});
 };
 
-//collectAthleteData(mens_meets_by_year);
-collectRegionalAthleteData(NCAA_PRELIM_MEN, 'ncaa prelim');
-// collectRegionalAthleteData(NCAA_PRELIM_WOMEN, 'ncaa prelim');
-// collectAthleteData(ACC_OUTDOOR_MEN, 'acc outdoor');
-// collectAthleteData(ACC_OUTDOOR_WOMEN, 'acc indoor');
-// collectAthleteData(ACC_INDOOR_MEN, 'acc indoor');
-// collectAthleteData(ACC_INDOOR_WOMEN, 'acc indoor');
-// collectAthleteData(PAC12_OUTDOOR_MEN, 'acc indoor');
-// collectAthleteData(PAC12_OUTDOOR_WOMEN, 'pac-12 outdoor');
-// collectAthleteData(MPSF_MEN, 'mpsf');
-// collectAthleteData(MPSF_WOMEN, 'mpsf');
+db.connect(MODE_TEST, () => {});
 
-const insertToDatabase = meetData => {
-	for (let year in meetData) {
-		for (let i = 0; i < meetData[year].length; i++) {
+const insertToDatabase = async (meetData, dc) => {
+	return new Promise((resolve, reject) => {
+		let athleteData = meetData.resultData;
+		for (let i = 0; i < athleteData.length; i++) {
 			db
 				.get()
-				.query(`INSERT INTO RESULTS VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
-					year,
-					meetData.meetName,
-					meetData[year][i].gender,
-					meetData[year][i].name,
-					meetData[year][i].mark,
-					meetData[year][i].place,
-					meetData[year][i].event,
-					meetData[year][i].round,
-					meetData[year][i].eventGroup,
-					meetData[year][i].school
-				]);
+				.query(
+					`INSERT INTO Results (year, meetNAme, gender, athleteName, mark, place, event, round, eventGroup, school) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+					[
+						parseInt(athleteData[i].meetYear),
+						meetData.meetName,
+						athleteData[i].gender,
+						athleteData[i].name,
+						athleteData[i].mark,
+						isNaN(parseInt(athleteData[i].place))
+							? 0
+							: parseInt(athleteData[i].place),
+						athleteData[i].event,
+						athleteData[i].round,
+						athleteData[i].eventGroup,
+						athleteData[i].school
+					],
+					(err, result) => {
+						if (err) {
+							//console.log(athleteData);
+							console.log(err);
+							reject(err);
+						}
+						resolve();
+					}
+				);
 		}
-	}
+	});
 };
+
+//collectAthleteData(mens_meets_by_year);
+collectAthleteData(NCAA_PRELIM_MEN, 'ncaa prelim', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(NCAA_PRELIM_WOMEN, 'ncaa prelim', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(ACC_OUTDOOR_MEN, 'acc outdoor', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(ACC_OUTDOOR_WOMEN, 'acc indoor', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(ACC_INDOOR_MEN, 'acc indoor', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(ACC_INDOOR_WOMEN, 'acc indoor', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(PAC12_OUTDOOR_MEN, 'pac-12 outdoor', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(PAC12_OUTDOOR_WOMEN, 'pac-12 outdoor', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(MPSF_MEN, 'mpsf', async meetData => {
+	await insertToDatabase(meetData);
+});
+collectAthleteData(MPSF_WOMEN, 'mpsf', async meetData => {
+	await insertToDatabase(meetData);
+});
