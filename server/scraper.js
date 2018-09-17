@@ -53,19 +53,21 @@ const collectRegionalAthleteData = async (data, meetName, done) => {
 	done(compiledMeetResults);
 };
 
-const collectAthleteData = async (data, meetName, done) => {
-	let compiledMeetResults = { meetName, resultData: [] };
-	//scrapeAthleteData('https://www.tfrrs.org/results/36170/m/NCAA_East_Preliminary_Round/', 'm');
-	for (let i = 0; i < data.length; i++) {
-		// console.log(prelims);
-		let meet = data[i];
-		let meetResults = await scrapeAthleteData(meet);
-		compiledMeetResults.resultData = compiledMeetResults.resultData.concat(
-			meetResults
-		);
-		//printAll(compiledMeetResults[year]);
-	}
-	done(compiledMeetResults);
+const collectAthleteData = async (data, meetName) => {
+	return new Promise(async (resolve, reject) => {
+		let compiledMeetResults = { meetName, resultData: [] };
+		//scrapeAthleteData('https://www.tfrrs.org/results/36170/m/NCAA_East_Preliminary_Round/', 'm');
+		for (let i = 0; i < data.length; i++) {
+			// console.log(prelims);
+			let meet = data[i];
+			let meetResults = await scrapeAthleteData(meet);
+			compiledMeetResults.resultData = compiledMeetResults.resultData.concat(
+				meetResults
+			);
+			//printAll(compiledMeetResults[year]);
+		}
+		resolve(compiledMeetResults);
+	});
 };
 
 // name$school$@year@!event!
@@ -136,8 +138,6 @@ const scrapeAthleteData = async meet => {
 	});
 };
 
-db.connect(MODE_TEST, () => {});
-
 const insertToDatabase = async (meetData, dc) => {
 	return new Promise((resolve, reject) => {
 		let athleteData = meetData.resultData;
@@ -174,33 +174,43 @@ const insertToDatabase = async (meetData, dc) => {
 };
 
 //collectAthleteData(mens_meets_by_year);
-collectAthleteData(NCAA_PRELIM_MEN, 'ncaa prelim', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(NCAA_PRELIM_WOMEN, 'ncaa prelim', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(ACC_OUTDOOR_MEN, 'acc outdoor', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(ACC_OUTDOOR_WOMEN, 'acc indoor', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(ACC_INDOOR_MEN, 'acc indoor', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(ACC_INDOOR_WOMEN, 'acc indoor', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(PAC12_OUTDOOR_MEN, 'pac-12 outdoor', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(PAC12_OUTDOOR_WOMEN, 'pac-12 outdoor', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(MPSF_MEN, 'mpsf', async meetData => {
-	await insertToDatabase(meetData);
-});
-collectAthleteData(MPSF_WOMEN, 'mpsf', async meetData => {
-	await insertToDatabase(meetData);
+const insertData = async () => {
+	return new Promise(async (resolve, reject) => {
+		console.log('started');
+		await insertToDatabase(
+			await collectAthleteData(NCAA_PRELIM_MEN, 'ncaa prelim')
+		);
+		console.log('second');		
+		await insertToDatabase(
+			await collectAthleteData(NCAA_PRELIM_WOMEN, 'ncaa prelim')
+		);
+		console.log('third');		
+		await insertToDatabase(
+			await collectAthleteData(ACC_OUTDOOR_MEN, 'acc outdoor')
+		);
+		await insertToDatabase(
+			await collectAthleteData(ACC_OUTDOOR_WOMEN, 'acc outdoor')
+		);
+		await insertToDatabase(
+			await collectAthleteData(ACC_INDOOR_MEN, 'acc indoor')
+		);
+		await insertToDatabase(
+			await collectAthleteData(ACC_INDOOR_WOMEN, 'acc indoor')
+		);
+		await insertToDatabase(
+			await collectAthleteData(PAC12_OUTDOOR_MEN, 'pac-12 outdoor')
+		);
+		await insertToDatabase(
+			await collectAthleteData(PAC12_OUTDOOR_WOMEN, 'pac-12 outdoor')
+		);
+		await insertToDatabase(await collectAthleteData(MPSF_MEN, 'mpsf'));
+		await insertToDatabase(await collectAthleteData(MPSF_WOMEN, 'mpsf'));
+		resolve();
+	});
+};
+
+db.connect(MODE_TEST, async () => {
+	await insertData();
+	console.log('done');
+	db.disconnect();
 });
