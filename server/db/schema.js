@@ -13,18 +13,26 @@ export const createDatabaseQueries = [
 
 export const Schemas = [
 	`DROP TABLE IF EXISTS Results`,
+	`DROP TABLE IF EXISTS Conferences`,
 	`CREATE TABLE Results (
         year int NOT NULL,
         meetName VARCHAR(255) NOT NULL,
-        gender ENUM('M', 'F', 'W'),
-        athleteName  VARCHAR(255) NOT NULL,
+		athleteName  VARCHAR(255) NOT NULL,
+		school VARCHAR(255) NOT NULL,
+		class VARCHAR(255) NOT NULL,
+		gender ENUM('M', 'F', 'W'),
+		place int NOT NULL,
+		event VARCHAR(255) NOT NULL,
         mark VARCHAR(255) NOT NULL,
-        place int NOT NULL,
-        event VARCHAR(255) NOT NULL,
-        round VARCHAR(255) NOT NULL,
+		round VARCHAR(255) NOT NULL,
         eventGroup VARCHAR(255) NOT NULL,
-        school VARCHAR(255) NOT NULL
-    )`
+		season VARCHAR(255) NOT NULL
+	)`,
+	`CREATE TABLE Conferences (
+		school VARCHAR(255) NOT NULL,
+		conference VARCHAR(255) NOT NULL DEFAULT 'N/A',
+		PRIMARY KEY (school)
+	)`
 ];
 
 const Views = [];

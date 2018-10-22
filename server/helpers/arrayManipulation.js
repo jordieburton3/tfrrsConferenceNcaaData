@@ -86,7 +86,7 @@ const determineEventGroup = input => {
 	return '';
 };
 
-const populateAthletes = (list, eventDetails, increment, meetYear) => {
+const populateAthletes = (list, eventDetails, increment, meetYear, season) => {
 	if (FIELD_EVENTS.includes(eventDetails.event)) {
 		return [];
 	} else if (checkRelay(eventDetails.event)) {
@@ -101,6 +101,7 @@ const populateAthletes = (list, eventDetails, increment, meetYear) => {
 			athleteDetails.school = list[i + 3];
 			athleteDetails.mark = list[i + 4];
 			athleteDetails.meetYear = meetYear;
+			athleteDetails.season = season;
 			athleteDetails.eventGroup = determineEventGroup(eventDetails.event);
 			athleteData.push(athleteDetails);
 		}

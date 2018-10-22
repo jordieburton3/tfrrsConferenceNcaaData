@@ -2,6 +2,8 @@ export const FIELD_EVENTS = [
 	'Javelin',
 	'High Jump',
 	'Pole Vault',
+	'Pentathlon',
+	'Heptathlon',
 	'Decathlon',
 	'Shot Put',
 	'Discus',
