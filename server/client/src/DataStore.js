@@ -7,18 +7,30 @@ export class DataStore extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            conferences: []
+            conferences: [],
+            schoolInfo: [],
+            eventInfo: [],
+            selectedConferences: [],
+            selectedSchools: [],
+            selectedEvents: [],
+
         };
         this.getConferences = this.getConferences.bind(this);
+        this._conferenceSelectorOnChange = this._conferenceSelectorOnChange.bind(this);
     }
 
     componentDidMount() {
         this.getConferences();
+        this.getEventSeasonInfo();
     }
 
     render() {
-        console.log(this.state);
-        return <AppContext.Provider value={this.state}>
+        return <AppContext.Provider value={{
+            state: this.state,
+            actions: {
+                conferenceSelectorOnChange: this._conferenceSelectorOnChange
+            }
+        }}>
                     {this.props.children}
                  </AppContext.Provider>
     }
@@ -26,8 +38,21 @@ export class DataStore extends React.PureComponent {
     async getConferences() {
         const res = await Api.getAllConferences();
         if (!res.error) {
-            const conferences = res.map(result => result.conference)
-            this.setState({ conferences });
+            const { conferences, schoolInfo } = res;
+            console.log(res);
+            this.setState({ conferences, schoolInfo });
         }
+    }
+
+    async getEventSeasonInfo() {
+        const res = await Api.getEventSeasonInfo();
+        if (!res.error) {
+            console.log(res);
+            this.setState({ eventInfo: res });
+        }
+    }
+
+    _conferenceSelectorOnChange(e) {
+        this.setState({ selectedConferences: e.map((selection) => selection.value) });
     }
 }

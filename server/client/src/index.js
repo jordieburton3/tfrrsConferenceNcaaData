@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import { Api } from './Api/Api';
-import { DataStore, AppContext } from './DataStore';
+import { DataStore } from './DataStore';
 import * as serviceWorker from './serviceWorker';
+import { ConnectedMeetDataSection } from './Configuration/MeetDataSection';
 
 class TestComponent extends React.PureComponent {
 
@@ -15,9 +14,7 @@ class TestComponent extends React.PureComponent {
 
 const ToRender = 
     <DataStore>
-        <AppContext.Consumer>
-            {(context) => <TestComponent conferences={context.conferences} />}
-        </AppContext.Consumer>
+        <ConnectedMeetDataSection />
     </DataStore>
 
 ReactDOM.render(ToRender, document.getElementById('root'));

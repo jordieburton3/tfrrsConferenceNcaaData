@@ -224,6 +224,7 @@ const insertData = async () => {
 		await insertToDatabase(
 			await collectAthleteData(NCAA_PRELIM_MEN, 'ncaa prelim', 'outdoor')
 		);
+		console.log("we in it");
 		await insertToDatabase(
 			await collectAthleteData(NCAA_PRELIM_WOMEN, 'ncaa prelim', 'outdoor')
 		);
@@ -381,7 +382,7 @@ const insertData = async () => {
 		);
 		await insertToDatabase(
 			await collectAthleteData(A_10_INDOOR_MENS, 'a-10', 'indoor'),
-			'indoor'
+			'a-10'
 		);
 		await insertToDatabase(
 			await collectAthleteData(A_10_INDOOR_WOMENS, 'a-10', 'indoor'),

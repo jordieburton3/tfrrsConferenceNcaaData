@@ -2,9 +2,11 @@ import express from 'express';
 import {
 	fetchMeetData,
 	fetchAll,
-	fetchConferenceRepresentation
+	fetchConferenceRepresentation,
+	getEventSeasonInfo
 } from '../helpers/queries/meets';
 import { getAllConferences } from '../helpers/queries/conferences';
+import { getAllSchools } from '../helpers/queries/schools';
 const router = express.Router();
 
 router.post('/api/conference', (req, res) => {
@@ -29,6 +31,18 @@ router.get('/api/get_all', (req, res) => {
 
 router.get('/api/get_conferences', (req, res) => {
 	getAllConferences(results => {
+		res.send(results);
+	});
+});
+
+router.get('/api/get_schools', (req, res) => {
+	getAllSchools(results => {
+		res.send(results);
+	});
+});
+
+router.get('/api/get_event_info', (req, res) => {
+	getEventSeasonInfo(results => {
 		res.send(results);
 	})
 });

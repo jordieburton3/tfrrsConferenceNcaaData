@@ -2,11 +2,12 @@ import db from '../../db/db';
 import mysql from 'mysql';
 
 export const getAllConferences = (done) => {
-    db.get().query('SELECT DISTINCT conference FROM Conferences', [], (err, results) => {
+    db.get().query('SELECT DISTINCT conference, school FROM Conferences', [], (err, results) => {
         if (err) {
             done({ error: err });
         } else {
-            done({ results });
+            const conferences = [...(new Set(results.map((res => res.conference))))]
+            done({ conferences, schoolInfo: results });
         }
     });
 }

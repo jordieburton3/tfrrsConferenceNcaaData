@@ -56,6 +56,18 @@ export const fetchIndividualPerformances = async (params, done) => {
 	}
 };
 
+export const getEventSeasonInfo = async (done) => {
+	db.get().query(
+		"SELECT DISTINCT event, season FROM Results", [], (err, results) => {
+			if (err) {
+				done({ error: err });
+			} else {
+				done(results);
+			}
+		}
+	)
+}
+
 const createBaseQuery = params => {
 	const {
 		gender,
